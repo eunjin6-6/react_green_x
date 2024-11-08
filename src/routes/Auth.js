@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+
 
 
 const Auth = ()=>{
@@ -84,6 +85,28 @@ const Auth = ()=>{
     setNewAccount(prev=>!prev);
   }
 
+  const onGoogleSignin =()=>{
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider)
+    .then((result) => {
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const token = credential.accessToken;
+      const user = result.user;
+      console.log(token, user)
+
+
+    }).catch((error) => {
+      //const errorCode = error.code;
+      const errorMessage = error.message;
+      const email = error.customData.email;
+      const credential = GoogleAuthProvider.credentialFromError(error);
+      console.log(email,credential);
+      setError(errorMessage);
+    });
+  }
+
+ 
+
   return(
     <div className="container">
       <h1 className="my-3">{newAccount ? '회원가입' : '로그인'}</h1>
@@ -96,11 +119,18 @@ const Auth = ()=>{
         <Form.Label>Password</Form.Label>
         <Form.Control type="password" name="password" onChange={onChange} />
       </Form.Group>
-      <Button type="submit" variant="primary">{newAccount ? '회원가입' : '로그인'}</Button>
+        <Button type="submit" variant="primary">{newAccount ? '회원가입' : '로그인'}</Button>
+      </Form>
+      <hr/>
+      {!newAccount ? (
+        <Button variant="info" onClick={onGoogleSignin}>Google로 로그인</Button>) 
+        :(
+        <Button variant="info" onClick={onGoogleSignin}>Google로 회원가입</Button> 
+        )
+        }
       <div className="mt-2">{error}</div>
-    </Form>
-    <hr/>
-      <Button variant="dark" onClick={toggleAccount}>&#128123; {newAccount ? '로그인으로 전환' : '회원가입으로 전환'}</Button>
+      <hr/>
+        <Button variant="dark" onClick={toggleAccount}>&#128123; {newAccount ? '로그인으로 전환' : '회원가입으로 전환'}</Button>
     </div>
   )
 }
