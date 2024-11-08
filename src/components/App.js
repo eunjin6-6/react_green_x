@@ -1,10 +1,10 @@
 import './App.css';
-import Auth from '../routes/Auth';
+import AppRouter from './Router';
 
 function App() {
   return (
     <div>
-      
+      <AppRouter />
     </div>
   );
 }
