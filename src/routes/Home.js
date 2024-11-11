@@ -5,6 +5,8 @@ import { db } from '../firebase';
 import { collection, addDoc, serverTimestamp, query, orderBy, limit, getDocs , onSnapshot} from "firebase/firestore"; 
 import ListGroup from 'react-bootstrap/ListGroup';
 import Comment from '../components/Comment';
+import { getStorage, ref } from "firebase/storage";
+import { v4 as uuidv4 } from 'uuid';
 
 
 
@@ -13,6 +15,18 @@ const Home = ({userObj})=>{
   const [comments, setComments] = useState([]); //조회된 글 정보들, 배열(리스트)
   const [attachment, setAttachment] = useState('');
 
+  //파일업로드 참조만들기
+  // Get a reference to the storage service, which is used to create references in your storage bucket
+  const storage = getStorage();
+
+  // Create a storage reference from our storage service
+  const storageRef = ref(storage);
+
+
+
+
+
+  
   //글 리스트 조회
   const getComments = async()=>{
      /*
