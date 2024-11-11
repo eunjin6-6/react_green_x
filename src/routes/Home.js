@@ -11,6 +11,7 @@ import Comment from '../components/Comment';
 const Home = ({userObj})=>{
   const [comment, setComment] = useState(''); //입력하는 글 정보
   const [comments, setComments] = useState([]); //조회된 글 정보들, 배열(리스트)
+  const [attachment, setAttachment] = useState('');
 
   //글 리스트 조회
   const getComments = async()=>{
@@ -72,9 +73,35 @@ const Home = ({userObj})=>{
   }
 
   const onFileChange = (e)=>{
-    //console.log(e.target.files[0]);//첨부파일 정보 확인
+    //console.log(e.target.files[0]);//첨부파일 정보 확인 1
     const theFile = e.target.files[0];
+    const reader = new FileReader();
+    
+    /*
+    reader.addEventListener(
+      "load", //3
+      (e) => {
+        console.log(e.target.result);
+      },
+      false,
+    );
+    아래 onloadend로 줄이기
+    */
 
+    reader.onloadend = (e) => {
+      console.log(e.target.result);
+      setAttachment(e.target.result);
+    }
+
+
+    if (theFile) { //첨부한 이미지가 있다면 2-1
+      reader.readAsDataURL(theFile); //데이터를 읽고2-2
+    }
+
+  }
+
+  const onClearFile = ()=>{
+    setAttachment(null);
   }
 
   return(
@@ -87,6 +114,10 @@ const Home = ({userObj})=>{
           <Form.Label>이미지</Form.Label>
           <Form.Control type="file" accept="image/*" size="sm" onChange={onFileChange}/>
         </Form.Group>
+        {attachment && <div className='mb-3'>
+          <img src={attachment} alt="" width="100"/>
+          <Button type="button" variant="secondary" size="sm" onClick={onClearFile}>취소</Button>
+        </div>}
         <Button type="submit" variant="primary">입력</Button>
       </Form>
       <hr/>
