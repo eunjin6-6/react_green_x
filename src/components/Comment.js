@@ -4,6 +4,7 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import Button from 'react-bootstrap/Button';
 import { doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { db } from '../firebase';
+import { getStorage, ref, deleteObject } from "firebase/storage";
 
 
 
@@ -15,10 +16,25 @@ const Comment = ({commentObj, isOwener})=>{
 
   //console.log(commentObj); 문서이름찾기
   const deleteComment = async ()=>{
+    const storage = getStorage();
+
     const deleteConfirm = window.confirm('정말 삭제할까요?');
+
     if(deleteConfirm){
       await deleteDoc(doc(db, "comments", commentObj.id));
+
+      //삭제 시 데이터에서도 파일 지우기
+      // Create a reference to the file to delete
+      const storageRef = ref(storage, commentObj.image);
+
+      // Delete the file
+      deleteObject(storageRef).then(() => {
+        // File deleted successfully
+      }).catch((error) => {
+        // Uh-oh, an error occurred!
+      });
     }
+    
   }
 
   const toggleEditMode = ()=>{
