@@ -6,14 +6,14 @@ import Nav from './Nav';
 import Profile from '../routes/Profile';
 
 //로그인 전/후비교해서 다른페이지 보여주기
-const AppRouter = ({isLoggedIn})=>{
+const AppRouter = ({isLoggedIn, userObj})=>{
   return (
     <>
     {isLoggedIn && <Nav />}
     <Routes>
       {isLoggedIn?
       <> 
-      <Route path="/" element={<Home/>} /> 
+      <Route path="/" element={<Home userObj={userObj} />} /> 
       <Route path="/profile" element={<Profile />} /> 
       </>
       : 
