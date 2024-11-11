@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import { Button } from 'react-bootstrap';
 import { db } from '../firebase';
-import { collection, addDoc, serverTimestamp, query, orderBy, limit, getDocs } from "firebase/firestore"; 
+import { collection, addDoc, serverTimestamp, query, orderBy, limit, getDocs , onSnapshot} from "firebase/firestore"; 
 import ListGroup from 'react-bootstrap/ListGroup';
 import Comment from '../components/Comment';
 
@@ -14,9 +14,10 @@ const Home = ({userObj})=>{
 
   //글 리스트 조회
   const getComments = async()=>{
+     /*
     const q = query(collection(db, "comments"), orderBy("date", "desc"), limit(5));
     const querySnapshot = await getDocs(q);
-    /*
+   
     querySnapshot.forEach((doc) => {
       // doc.data() is never undefined for query doc snapshots
       console.log(doc.id, " => ", doc.data());
@@ -28,11 +29,18 @@ const Home = ({userObj})=>{
       setComments(prev=>[commentObj, ...prev]);
     });
     배열만 먼저 만들어주고, 한방에 넣는걸로 변경
-    */
-
+    
     //const commentArr = querySnapshot.docs.map(doc=>{return{...doc.data(), id:doc.id}})
     const commentArr = querySnapshot.docs.map(doc=>({...doc.data(), id:doc.id}))
     setComments(commentArr);
+    */
+
+    //작성 시 실시간 반영
+    const q = query(collection(db, "comments"), orderBy("date", "desc"), limit(5));
+    onSnapshot(q, (querySnapshot) => {
+      const commentArr = querySnapshot.docs.map(doc=>({...doc.data(), id:doc.id}))
+      setComments(commentArr);
+});
   }
   //console.log(comments);
 
@@ -56,7 +64,7 @@ const Home = ({userObj})=>{
         date: serverTimestamp(),
         uid: userObj
       });
-      console.log("Document written with ID: ", docRef.id);
+      document.querySelector('#comment').value='';
     }
     catch(e){
       console.log("Document written with ID: ", e);
