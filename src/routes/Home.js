@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import { Button } from 'react-bootstrap';
 import { db } from '../firebase';
-import { collection, addDoc, serverTimestamp, query, orderBy, limit, getDocs , onSnapshot} from "firebase/firestore"; 
+import { collection, addDoc, serverTimestamp, query, orderBy, limit , onSnapshot} from "firebase/firestore"; 
 import ListGroup from 'react-bootstrap/ListGroup';
 import Comment from '../components/Comment';
-import { getStorage, ref } from "firebase/storage";
+import { getStorage, ref, uploadString, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from 'uuid';
 
 
@@ -24,9 +24,6 @@ const Home = ({userObj})=>{
 
 
 
-
-
-  
   //글 리스트 조회
   const getComments = async()=>{
      /*
@@ -71,19 +68,35 @@ const Home = ({userObj})=>{
 
   const onSubmit = async (e)=>{
     e.preventDefault();
-    console.log(comment, '실행');
-    // Add a new document with a generated id.
-    try{
-      const docRef = await addDoc(collection(db, "comments"), {
-        comment:comment,
-        date: serverTimestamp(),
-        uid: userObj
-      });
-      document.querySelector('#comment').value='';
-    }
-    catch(e){
-      console.log("Document written with ID: ", e);
-    }
+    //console.log(comment, '실행');
+
+    //파일첨부
+    const storageRef = ref(storage, `${userObj}/${uuidv4()}`);
+
+    //파일 업로드
+    uploadString(storageRef, attachment, 'data_url').then(async (snapshot) => {
+      //console.log('파일 업로드 완료!');
+      //console.log(await getDownloadURL(storageRef)); //업로드한 이미지 경로 확인
+
+      const imageURL = await getDownloadURL(storageRef);
+
+      try{
+        await addDoc(collection(db, "comments"), {
+          comment:comment,
+          date: serverTimestamp(),
+          uid: userObj,
+          image: imageURL
+        });
+        document.querySelector('#comment').value='';
+        setAttachment('');
+      }
+      catch(e){
+        console.log("Document written with ID: ", e);
+      }
+    });
+
+
+
   }
 
   const onFileChange = (e)=>{
