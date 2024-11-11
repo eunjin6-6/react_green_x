@@ -51,8 +51,8 @@ const Comment = ({commentObj, isOwener})=>{
               <Form.Control type="text" value={comment} onChange={onChange} placeholder="글을 입력해주세요" />
             </Form.Group>
             <div className="d-flex gap-2 justify-content-start">
-            <Button type="button" variant="info" onClick={toggleEditMode} size="sm">취소</Button>
-            <Button type="submit" variant="success" size="sm">입력</Button>
+            <Button type="button" variant="secondary" onClick={toggleEditMode} size="sm">취소</Button>
+            <Button type="submit" variant="primary" size="sm">입력</Button>
             </div>
           </Form>
         
@@ -62,7 +62,7 @@ const Comment = ({commentObj, isOwener})=>{
           {commentObj.comment}
           {isOwener && 
             <div className="d-flex gap-2">
-              <Button variant="secondary" onClick={toggleEditMode} size="sm">수정</Button>
+              <Button variant="warning" onClick={toggleEditMode} size="sm">수정</Button>
               <Button variant="danger" onClick={deleteComment} size="sm">삭제</Button>
             </div>
           } 
