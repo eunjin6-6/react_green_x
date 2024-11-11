@@ -102,6 +102,7 @@ const Home = ({userObj})=>{
 
   const onClearFile = ()=>{
     setAttachment(null);
+    document.querySelector('#formFileSm').value = '';
   }
 
   return(
