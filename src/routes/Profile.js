@@ -3,7 +3,10 @@ import { getAuth, signOut, updateProfile } from "firebase/auth";
 import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { authService } from '../firebase';
+import { authService, db } from '../firebase';
+import { collection, query, orderBy, limit , onSnapshot, where } from "firebase/firestore"; 
+import ListGroup from 'react-bootstrap/ListGroup';
+import Comment from '../components/Comment';
 
 console.log(authService);
 
@@ -13,9 +16,28 @@ const Profile = ()=>{
   //console.log(userObj); //uSISCGRRf1Uc3YpSuL4q7fsELLm1
   const profilePath = `${process.env.PUBLIC_URL}/profile_icon.svg`;
   const [profile, setProfile] = useState(profilePath);
-
+  const [comments, setComments] = useState([]); //조회된 글 정보들, 배열(리스트)
 
   const navigate = useNavigate();
+
+  const getComments = async()=>{
+
+   //작성 시 실시간 반영
+   const q = query(collection(db, "comments"), where("uid", "==", user.uid), orderBy("date", "desc"), limit(5));
+   onSnapshot(q, (querySnapshot) => {
+     const commentArr = querySnapshot.docs.map(doc=>({...doc.data(), id:doc.id}))
+     setComments(commentArr);
+    });
+  }
+  
+  useEffect(()=>{
+    getComments();
+  },[]) //최초 렌더링 후 실행, 변동시 실행
+
+
+
+
+
   const onLogoutClick = () =>{
     const auth = getAuth();
 
@@ -49,6 +71,7 @@ const Profile = ()=>{
       photoURL: profileURL
     });
   }
+
   
   useEffect(()=>{
     user.photoURL !== null && setProfile(user.photoURL);
@@ -67,10 +90,11 @@ const Profile = ()=>{
         </div>
       <hr/>      
       <h3>My Comment List</h3>
-      <ul className="commentList">
-        
-      </ul>
-     
+        <ListGroup>
+          {comments.map(item=>
+            <Comment key={item.id} commentObj={item}/>
+          )}
+        </ListGroup>    
     </div>
   )
 }
