@@ -92,7 +92,7 @@ const Profile = ()=>{
       <h3>My Comment List</h3>
         <ListGroup>
           {comments.map(item=>
-            <Comment key={item.id} commentObj={item}/>
+            <Comment key={item.id} commentObj={item} isOwener={true}/>
           )}
         </ListGroup>    
     </div>
