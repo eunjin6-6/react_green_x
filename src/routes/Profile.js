@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { authService, db } from '../firebase';
-import { collection, query, orderBy, limit , onSnapshot, where } from "firebase/firestore"; 
+import { collection, query, orderBy, limit , getDocs, where } from "firebase/firestore"; 
 import ListGroup from 'react-bootstrap/ListGroup';
 import Comment from '../components/Comment';
 
@@ -12,27 +12,21 @@ console.log(authService);
 
 const Profile = ()=>{
   const user = authService.currentUser;
-
-  //console.log(userObj); //uSISCGRRf1Uc3YpSuL4q7fsELLm1
   const profilePath = `${process.env.PUBLIC_URL}/profile_icon.svg`;
   const [profile, setProfile] = useState(profilePath);
-  const [comments, setComments] = useState([]); //조회된 글 정보들, 배열(리스트)
-
+  const [comments, setComments] = useState([]); //조회된 글 배열
   const navigate = useNavigate();
 
-  const getComments = async()=>{
-
-   //작성 시 실시간 반영
-   const q = query(collection(db, "comments"), where("uid", "==", user.uid), orderBy("date", "desc"), limit(5));
-   onSnapshot(q, (querySnapshot) => {
-     const commentArr = querySnapshot.docs.map(doc=>({...doc.data(), id:doc.id}))
-     setComments(commentArr);
-    });
+  const getComments = async ()=>{
+    const q = query(collection(db, "comments"), where("uid", "==", user.uid), orderBy("date", "desc"), limit(5));
+    const querySnapshot = await getDocs(q);
+    const commentArr = querySnapshot.docs.map(doc=>({...doc.data(), id:doc.id}))
+    setComments(commentArr);
   }
-  
+
   useEffect(()=>{
     getComments();
-  },[]) //최초 렌더링 후 실행, 변동시 실행
+  },[]) //최소 렌더링후 실행, 변동시 실행
 
 
 
@@ -75,7 +69,7 @@ const Profile = ()=>{
   
   useEffect(()=>{
     user.photoURL !== null && setProfile(user.photoURL);
-  },[]) //최초한번 실행, 그리고 그 값이 변경되면 다시 실행
+  },[]) //최초한번 실행, 값이 변경되면 실행
   
   return(
     <div className='container'>
